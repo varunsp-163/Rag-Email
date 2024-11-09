@@ -35,16 +35,17 @@ export class Account {
 
     async performInitialSync() {
         try {
-            let daysWithin = 3;
+            const daysWithin = 3;
             let syncRes = await this.startSync(daysWithin)
             while (!syncRes.ready) {
                 await new Promise(resolve => setTimeout(resolve, 1000))
                 syncRes = await this.startSync(daysWithin)
             }
+
             console.log('Sync is ready. Tokens:', syncRes);
             // get the bookmark deltaToken
-            let storedDeltaToken: string = syncRes.syncDeletedToken
-            let updatedResponse = await this.getUpdatedEmails({ deltaToken: storedDeltaToken })
+            let storedDeltaToken: string = syncRes.syncUpdatedToken
+            let updatedResponse = await this.getUpdatedEmails({ deltaToken: syncRes.syncUpdatedToken });
             if (updatedResponse.nextDeltaToken) {
                 // sync is done
                 storedDeltaToken = updatedResponse.nextDeltaToken
