@@ -9,6 +9,7 @@ import { TabsContent } from '@radix-ui/react-tabs'
 import AccountSwitcher from './AccountSwitcher'
 import Sidebar from './sidebar'
 import ThreadList from './thread-list'
+import ThreaDisplay from './thread-display'
 
 
 
@@ -63,7 +64,6 @@ const Mail = ({ defaultLayout = [20, 32, 48], navCollapsedSize, defaultCollapse 
                                 </TabsTrigger>
                                 <TabsTrigger value="done" className='text-zinc-200 dark:text-zinc-200'>
                                     Done
-
                                 </TabsTrigger>
                             </TabsList>
                         </div>
@@ -79,11 +79,11 @@ const Mail = ({ defaultLayout = [20, 32, 48], navCollapsedSize, defaultCollapse 
                     </Tabs>
                 </ResizablePanel>
                 {/* The thing tool resize */}
-                <ResizableHandle />
+                <ResizableHandle withHandle/>
                 {/* And the thing tobe resized */}
                 <ResizablePanel defaultSize={defaultLayout[2]} minSize={30}>
                     {/* Display the Threads */}
-                    Mails
+                    <ThreaDisplay />
                 </ResizablePanel>
             </ResizablePanelGroup>
         </TooltipProvider>

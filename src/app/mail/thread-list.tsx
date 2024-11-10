@@ -31,7 +31,7 @@ const threadList = () => {
                                 {date}
                             </div>
                             {threads.map(thread => {
-                                return <button onClick={() => setThreadId(thread.id)} className={cn('flex flex-col items-start gap-2 border p-3 text-left text-sm transition-all relative rounded-lg',
+                                return <button onClick={() => setThreadId(thread.id)} className={cn('hover:bg-accent my-2 flex flex-col items-start gap-6 border p-3 text-left text-sm transition-all relative rounded-lg',
                                     { 'bg-accent': thread.id === threadId })
                                 } key={thread.id}>
                                     <div className='flex flex-col gap-2 w-full'>
