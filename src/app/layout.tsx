@@ -1,5 +1,5 @@
 import "@/styles/globals.css";
-
+import { ThemeProvider } from "@/components/theme-provider"
 import {
   ClerkProvider,
 } from '@clerk/nextjs'
@@ -22,7 +22,14 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" className={`${GeistSans.variable}`}>
         <body>
-          <TRPCReactProvider>{children}</TRPCReactProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <TRPCReactProvider>{children}</TRPCReactProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>
