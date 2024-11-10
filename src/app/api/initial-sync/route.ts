@@ -1,8 +1,9 @@
 import { Account } from "@/lib/account";
-// import { syncEmailsToDatabase } from "@/lib/sync-to-db";
+import { syncEmailsToDatabase } from "@/lib/sync-to-db";
 import { db } from "@/server/db";
 // import { auth } from "@clerk/nextjs/server";
 import { type NextRequest, NextResponse } from "next/server";
+import { string } from "zod";
 
 export const maxDuration = 300
 
@@ -25,18 +26,17 @@ export const POST = async (req: NextRequest) => {
     if (!response) return NextResponse.json({ error: "FAILED_TO_SYNC" }, { status: 500 });
 
     const { deltaToken, emails } = response
-    console.log("The emails are:", emails)
 
-    // await syncEmailsToDatabase(emails, accountId)
+    await syncEmailsToDatabase(emails, accountId)
 
-    // await db.account.update({
-    //     where: {
-    //         token: dbAccount.token,
-    //     },
-    //     data: {
-    //         nextDeltaToken: deltaToken,
-    //     },
-    // });
+    await db.account.update({
+        where: {
+            token: dbAccount.token,
+        },
+        data: {
+            nextDeltaToken: deltaToken,
+        },
+    });
     console.log('sync complete', deltaToken)
     console.log("Number of emails:", emails.length)
     return NextResponse.json({ success: true, deltaToken }, { status: 200 });
