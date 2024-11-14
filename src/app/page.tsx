@@ -1,4 +1,4 @@
-import LinkAccountButton from "@/components/linkAccountButton";
+import LinkAccountButton from "@/components/LinkAccountButton";
 import { Button } from "@/components/ui/button";
 
 
