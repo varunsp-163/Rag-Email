@@ -15,6 +15,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { format } from 'date-fns'
 import EmailDisplay from './email-display'
+import ReplyBox from './reply-box'
 
 
 const ThreaDisplay = () => {
@@ -98,11 +99,13 @@ const ThreaDisplay = () => {
                             return <EmailDisplay email={e} key={e.id} />
                         })}
                     </div>
-                    <div className="flex-1">
-                    </div>
-                    <Separator className='mt-auto' />
-                    {/* Reply Box */}
                 </div>
+                <div className="flex-1">
+                </div>
+                <Separator className='mt-auto' />
+                {/* Reply Box */}
+                <ReplyBox />
+
             </div> : <div className='p-8 text-center text-muted-foreground'>No Message Selected</div>}
         </div>
     )

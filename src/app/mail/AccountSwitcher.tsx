@@ -49,7 +49,6 @@ const AccountSwitcher = ({ isCollapsed }: Props) => {
                         const authUrl = await getAurinkoAuthUrl('Google')
                         window.location.href = authUrl
                     }} className='flex relative hover:bg-gray-50 cursor-pointer w-full items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent'>
-
                         <Plus className='m-1 size-4' />
                         Add Account
                     </div>
