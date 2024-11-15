@@ -1,4 +1,4 @@
-
+'use client'
 import ThemeToggle from '@/components/theme-toggle'
 import dynamic from 'next/dynamic'
 import React from 'react'
