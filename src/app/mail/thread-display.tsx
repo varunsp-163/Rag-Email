@@ -16,11 +16,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { format } from 'date-fns'
 import EmailDisplay from './email-display'
 import ReplyBox from './reply-box'
+import { useAtom } from 'jotai'
+import { isSearchingAtom } from './search-bar'
+import SearchDisplay from './search-display'
 
 
 const ThreaDisplay = () => {
     const { threadId, threads } = useThreads()
     const thread = threads?.find(t => t.id === threadId)
+    const [isSearching] = useAtom(isSearchingAtom)
     // console.log(thread)
     return (
         <div className='flex flex-col h-full overflow-scroll'>
@@ -61,50 +65,56 @@ const ThreaDisplay = () => {
                 </div>
             </div>
             <Separator />
-            {thread ? <div className='flex flex-col flex-1 overflow-scroll'>
-                <div className='flex items-center p-2'>
-                    <div className='flex items-center gap-4 text-sm'>
-                        <Avatar>
-                            {/* <AvatarImage src="https://github.com/shadcn.png" alt="avatar" /> */}
-                            <AvatarFallback>{thread.emails[0]?.from?.name?.split(' ').map(c => c[0]).join('')}</AvatarFallback>
-                        </Avatar>
-                        <div className='grid gap-1'>
-                            <div className='font-semibold'>
-                                {thread.emails[0]?.from?.name}
-                                <div className='text-xs line clamp-1'>
-                                    {thread.emails[0]?.subject}
-                                </div>
-                                <div className='text-xs line clamp-1'>
-                                    <span className="font-medium">
-                                        Reply-To:
-                                    </span>
-                                    {thread.emails[0]?.from?.address}
+            {isSearching ? <><SearchDisplay /></> :
+                <>
+                    {thread ? <div className='flex flex-col flex-1 overflow-scroll'>
+                        <div className='flex items-center p-2'>
+                            <div className='flex items-center gap-4 text-sm'>
+                                <Avatar>
+                                    {/* <AvatarImage src="https://github.com/shadcn.png" alt="avatar" /> */}
+                                    <AvatarFallback>{thread.emails[0]?.from?.name?.split(' ').map(c => c[0]).join('')}</AvatarFallback>
+                                </Avatar>
+                                <div className='grid gap-1'>
+                                    <div className='font-semibold'>
+                                        {thread.emails[0]?.from?.name}
+                                        <div className='text-xs line clamp-1'>
+                                            {thread.emails[0]?.subject}
+                                        </div>
+                                        <div className='text-xs line clamp-1'>
+                                            <span className="font-medium">
+                                                Reply-To:
+                                            </span>
+                                            {thread.emails[0]?.from?.address}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                            {thread.emails[0]?.sentAt && (
+                                <div className='ml-auto text-xs text-muted-foreground'>
+                                    {format(new Date(thread.emails[0]?.sentAt), "PPpp")}
+                                </div>
+                            )}
                         </div>
-                    </div>
-                    {thread.emails[0]?.sentAt && (
-                        <div className='ml-auto text-xs text-muted-foreground'>
-                            {format(new Date(thread.emails[0]?.sentAt), "PPpp")}
+                        <Separator />
+                        <div className='max-h-[calc(100vh-450px)] overflow-scroll flex flex-col'>
+                            <div className='flex flex-col gap-4 p-6'>
+                                {thread.emails.map(e => {
+                                    // Display Email Subject
+                                    return <EmailDisplay email={e} key={e.id} />
+                                })}
+                            </div>
                         </div>
-                    )}
-                </div>
-                <Separator />
-                <div className='max-h-[calc(100vh-450px)] overflow-scroll flex flex-col'>
-                    <div className='flex flex-col gap-4 p-6'>
-                        {thread.emails.map(e => {
-                            // Display Email Subject
-                            return <EmailDisplay email={e} key={e.id} />
-                        })}
-                    </div>
-                </div>
-                <Separator className='mt-auto' />
-                {/* Reply Box */}
-                <div className='overflow-scroll max-h-[300px]'>
-                    <ReplyBox />
-                </div>
+                        <Separator className='mt-auto' />
+                        {/* Reply Box */}
+                        <div className='overflow-scroll max-h-[300px]'>
+                            <ReplyBox />
+                        </div>
 
-            </div> : <div className='p-8 text-center text-muted-foreground'>No Message Selected</div>}
+                    </div> : <div className='p-8 text-center text-muted-foreground'>No Message Selected</div>}
+                </>
+            }
+
+
         </div>
     )
 }

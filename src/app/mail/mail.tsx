@@ -10,6 +10,7 @@ import AccountSwitcher from './AccountSwitcher'
 import Sidebar from './sidebar'
 import ThreadList from './thread-list'
 import ThreaDisplay from './thread-display'
+import SearchBar from './search-bar'
 
 
 
@@ -69,7 +70,7 @@ const Mail = ({ defaultLayout = [20, 32, 48], navCollapsedSize, defaultCollapse 
                         </div>
                         <Separator />
                         {/* Search bar */}
-                        Search Bar
+                        <SearchBar />
                         <TabsContent value='inbox'>
                             <ThreadList />
                         </TabsContent>
@@ -79,7 +80,7 @@ const Mail = ({ defaultLayout = [20, 32, 48], navCollapsedSize, defaultCollapse 
                     </Tabs>
                 </ResizablePanel>
                 {/* The thing tool resize */}
-                <ResizableHandle withHandle/>
+                <ResizableHandle withHandle />
                 {/* And the thing tobe resized */}
                 <ResizablePanel defaultSize={defaultLayout[2]} minSize={30}>
                     {/* Display the Threads */}

@@ -65,13 +65,12 @@ model Account {
     id     String @id @default(cuid())
     userId String
 
-    binaryIndex Json?
-
     token        String @unique
     provider     String
     emailAddress String
     name         String
 
+    oramaIndex     String?
     nextDeltaToken String?
 
     user           User           @relation(fields: [userId], references: [id])
@@ -128,6 +127,7 @@ model Email {
     replyTo              EmailAddress[]        @relation("ReplyToEmails")
     hasAttachments       Boolean
     body                 String?
+    rawBody              String?
     bodySnippet          String?
     attachments          EmailAttachment[]
     inReplyTo            String?

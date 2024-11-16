@@ -38,7 +38,7 @@ export class Account {
     async performInitialSync() {
         console.log("In performInitialSync")
         try {
-            const daysWithin = 3;
+            const daysWithin = 1; // getting prev 1 day emails
             let syncRes = await this.startSync(daysWithin)
             while (!syncRes.ready) {
                 await new Promise(resolve => setTimeout(resolve, 1000))

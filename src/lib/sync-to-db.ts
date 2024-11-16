@@ -2,18 +2,47 @@ import { db } from '@/server/db';
 import type { SyncUpdatedResponse, EmailMessage, EmailAddress, EmailAttachment, EmailHeader } from './types';
 import pLimit from 'p-limit';
 import { Prisma } from '@prisma/client';
+import { OramaClient } from './orama'
+import { turndown } from './turndown';
 
 async function syncEmailsToDatabase(emails: EmailMessage[], accountId: string) {
     console.log(`Syncing ${emails.length} emails to database`);
-    const limit = pLimit(10); // Process up to 10 emails concurrently
+    const limit = pLimit(20); // Process up to 10 emails concurrently
+
+    const orama = new OramaClient(accountId)
+    await orama.initialize()
+    console.log("syncing to orama")
 
     try {
-        Promise.all(emails.map((email, index) => upsertEmail(email, index, accountId)))
-        // for (const email of emails) {
-        //     await upsertEmail(email, accountId, 0)
-        // }
+
+        async function syncToOrama() {
+            await Promise.all(emails.map(email => {
+                return limit(async () => {
+                    const body = turndown.turndown(email.body ?? email.bodySnippet ?? '')
+                    await orama.insert({
+                        title: email.subject,
+                        body: body,
+                        rawBody: email.bodySnippet ?? '',
+                        from: `${email.from.name} <${email.from.address}>`,
+                        to: email.to.map(t => `${t.name} <${t.address}>`),
+                        sentAt: new Date(email.sentAt).toLocaleString(),
+                        threadId: email.threadId
+                    })
+                })
+            }))
+        }
+
+        async function syncToDB() {
+            for (const [index, email] of emails.entries()) {
+                await upsertEmail(email, index, accountId);
+            }
+        }
+
+        await Promise.all([syncToOrama(), syncToDB()])
+
+        await orama.saveIndex()
     } catch (error) {
-        console.log("Error", error)
+        console.log('error', error)
     }
 }
 
