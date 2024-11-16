@@ -1,5 +1,5 @@
 import axios from "axios"
-import { EmailMessage, SyncResponse, SyncUpdatedResponse } from "./types"
+import { EmailAddress, EmailMessage, SyncResponse, SyncUpdatedResponse } from "./types"
 
 export class Account {
     private token: string
@@ -8,7 +8,7 @@ export class Account {
     }
 
     private async startSync() {
-        const res = await axios.post<SyncResponse>("https://api.aurinko.io/v1/email/sync", {}, {
+        const res = await axios.post<SyncResponse>(`${process.env.API_BASE_URL}/email/sync`, {}, {
             headers: {
                 Authorization: `Bearer ${this.token}`,
             },
@@ -25,7 +25,7 @@ export class Account {
         if (deltaToken) params.deltaToken = deltaToken
         if (pageToken) params.pageToken = pageToken
 
-        const res = await axios.get<SyncUpdatedResponse>("https://api.aurinko.io/v1/email/sync/updated", {
+        const res = await axios.get<SyncUpdatedResponse>(`${process.env.API_BASE_URL}/email/sync/updated`, {
             headers: {
                 Authorization: `Bearer ${this.token}`,
             }, params
@@ -34,6 +34,7 @@ export class Account {
     }
 
     async performInitialSync() {
+        console.log("In performInitialSync")
         try {
             const daysWithin = 3;
             let syncRes = await this.startSync(daysWithin)
@@ -75,8 +76,62 @@ export class Account {
         }
     }
 
-    async sendEmail({ from }: { from: string }) {
-        console.log(from)
+    async sendEmail({
+        from,
+        subject,
+        body,
+        inReplyTo,
+        references,
+        threadId,
+        to,
+        cc,
+        bcc,
+        replyTo,
+    }: {
+        from: EmailAddress;
+        subject: string;
+        body: string;
+        inReplyTo?: string;
+        references?: string;
+        threadId?: string;
+        to: EmailAddress[];
+        cc?: EmailAddress[];
+        bcc?: EmailAddress[];
+        replyTo?: EmailAddress;
+    }) {
+        try {
+            const response = await axios.post(
+                `${process.env.API_BASE_URL}/email/messages`,
+                {
+                    from,
+                    subject,
+                    body,
+                    inReplyTo,
+                    references,
+                    threadId,
+                    to,
+                    cc,
+                    bcc,
+                    replyTo: [replyTo],
+                },
+                {
+                    params: {
+                        returnIds: true,
+                    },
+                    headers: { Authorization: `Bearer ${this.token}` }
+                }
+            );
+
+            console.log('email sent', response.data)
+            return response.data;
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                console.error('Error sending email:', JSON.stringify(error.response?.data, null, 2));
+            } else {
+                console.error('Error sending email:', error);
+            }
+            throw error;
+        }
     }
 
 }

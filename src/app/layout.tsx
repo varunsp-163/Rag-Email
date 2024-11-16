@@ -7,6 +7,7 @@ import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 
 import { TRPCReactProvider } from "@/trpc/react";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "RAG EMAIL",
@@ -29,6 +30,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <TRPCReactProvider>{children}</TRPCReactProvider>
+            <Toaster />
           </ThemeProvider>
         </body>
       </html>

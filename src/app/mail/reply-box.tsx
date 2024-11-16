@@ -2,8 +2,8 @@
 import React from 'react'
 import EmailEditor from './email-editor'
 import { api, type RouterOutputs } from '@/trpc/react'
-import { toast } from 'sonner'
 import useThreads from '@/hooks/use-threads'
+import { toast } from 'sonner'
 
 const ReplyBox = () => {
 
@@ -26,7 +26,7 @@ const Component = ({ replyDetails }: { replyDetails: RouterOutputs['account']['g
     const [toValues, setToValues] = React.useState<{ label: string, value: string }[]>(replyDetails.to.map(to => ({ label: to.address ?? to.name, value: to.address })) || [])
     const [ccValues, setCcValues] = React.useState<{ label: string, value: string }[]>(replyDetails.cc.map(cc => ({ label: cc.address ?? cc.name, value: cc.address })) || [])
 
-    // const sendEmail = api.account.sendEmail.useMutation()
+    const sendEmail = api.account.sendEmail.useMutation()
     React.useEffect(() => {
         if (!replyDetails || !threadId) return;
 
@@ -40,23 +40,27 @@ const Component = ({ replyDetails }: { replyDetails: RouterOutputs['account']['g
 
     const handleSend = async (value: string) => {
         console.log("Sent: ", value)
-        // if (!replyDetails) return;
-        // sendEmail.mutate({
-        //     accountId,
-        //     threadId: threadId ?? undefined,
-        //     body: value,
-        //     subject,
-        //     from: replyDetails.from,
-        //     to: replyDetails.to.map(to => ({ name: to.name ?? to.address, address: to.address })),
-        //     cc: replyDetails.cc.map(cc => ({ name: cc.name ?? cc.address, address: cc.address })),
-        //     replyTo: replyDetails.from,
-        //     inReplyTo: replyDetails.id,
-        // }, {
-        //     onSuccess: () => {
-        //         toast.success("Email sent")
-        //         // editor?.commands.clearContent()
-        //     }
-        // })
+        if (!replyDetails) return;
+        console.log("sendEmail", sendEmail)
+        sendEmail.mutate({
+            accountId,
+            threadId: threadId ?? undefined,
+            body: value,
+            subject,
+            from: replyDetails.from,
+            to: replyDetails.to.map(to => ({ name: to.name ?? to.address, address: to.address })),
+            cc: replyDetails.cc.map(cc => ({ name: cc.name ?? cc.address, address: cc.address })),
+            replyTo: replyDetails.from,
+            inReplyTo: replyDetails.id,
+        }, {
+            onSuccess: () => {
+                toast.success("Email sent")
+                editor?.commands.clearContent()
+            },
+            onError: () => {
+                toast.error("Failed to send email")
+            }
+        })
     }
 
     return (
@@ -71,7 +75,7 @@ const Component = ({ replyDetails }: { replyDetails: RouterOutputs['account']['g
             setSubject={setSubject}
             to={toValues.map(to => to.value)}
             handleSend={handleSend}
-            isSending={false}
+            isSending={sendEmail.isPending}
         />
     )
 
