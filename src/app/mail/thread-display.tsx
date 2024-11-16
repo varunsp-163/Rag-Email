@@ -23,7 +23,7 @@ const ThreaDisplay = () => {
     const thread = threads?.find(t => t.id === threadId)
     // console.log(thread)
     return (
-        <div className='flex flex-col h-sull'>
+        <div className='flex flex-col h-full overflow-scroll'>
             {/* buttons */}
             <div className='items-center flex p-2'>
                 <div className="flex items-center-gap-2">
@@ -36,7 +36,6 @@ const ThreaDisplay = () => {
                     <Button variant={"ghost"} size="icon" disabled={!thread}>
                         <Trash2 className='size-4' />
                     </Button>
-
                 </div>
                 <Separator orientation='vertical' className='ml-2' />
                 <Button className='ml-2' variant={'ghost'} size={'icon'} disabled={!thread}>
@@ -63,8 +62,7 @@ const ThreaDisplay = () => {
             </div>
             <Separator />
             {thread ? <div className='flex flex-col flex-1 overflow-scroll'>
-
-                <div className='flex items-center p-4'>
+                <div className='flex items-center p-2'>
                     <div className='flex items-center gap-4 text-sm'>
                         <Avatar>
                             {/* <AvatarImage src="https://github.com/shadcn.png" alt="avatar" /> */}
@@ -100,11 +98,11 @@ const ThreaDisplay = () => {
                         })}
                     </div>
                 </div>
-                <div className="flex-1">
-                </div>
                 <Separator className='mt-auto' />
                 {/* Reply Box */}
-                <ReplyBox />
+                <div className='overflow-scroll max-h-[300px]'>
+                    <ReplyBox />
+                </div>
 
             </div> : <div className='p-8 text-center text-muted-foreground'>No Message Selected</div>}
         </div>

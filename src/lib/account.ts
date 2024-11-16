@@ -74,4 +74,9 @@ export class Account {
             }
         }
     }
+
+    async sendEmail({ from }: { from: string }) {
+        console.log(from)
+    }
+
 }

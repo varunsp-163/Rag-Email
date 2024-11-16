@@ -13,6 +13,8 @@ import { Bot } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
 import { generateEmail } from './action'
 import { readStreamableValue } from 'ai/rsc'
+import useThreads from '@/hooks/use-threads'
+import { turndown } from '@/lib/turndown'
 
 
 type Props = {
@@ -23,23 +25,41 @@ type Props = {
 
 const AiComposeButton = (props: Props) => {
 
+    const { threads, threadId, account } = useThreads()
+
+    const thread = threads?.find(t => t.id === threadId)
+
     const [open, setOpen] = React.useState<boolean>(false)
     const [prompt, setPrompt] = React.useState<string>("")
 
     const aiGenerate = async () => {
-        const { output } = await generateEmail("", prompt)
-        console.log("prompt",prompt)
+        let context = ''
+
+        if (!props.isComposing) {
+            for (const email of thread?.emails ?? []) {
+                const content = `
+                Subject:${email.subject}
+                From:${email.from.address}
+                SentAt:${new Date(email.sentAt).toLocaleString()}
+                Body:${turndown.turndown(email.body ?? email.bodySnippet ?? "")}
+                `
+                context += content
+            }
+        }
+        context += `My name is ${account?.name} and my email is ${account?.emailAddress}.`
+
+        const { output } = await generateEmail(context, prompt)
+        console.log("prompt", prompt)
         for await (const token of readStreamableValue(output)) {
             console.log(token)
             if (token)
                 props.onGenerate(token)
-            else console.log("No token")
         }
     }
 
     return (
 
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger>
                 <Button>
                     <Bot size='icon' onClick={() => setOpen(true)} />
@@ -61,9 +81,7 @@ const AiComposeButton = (props: Props) => {
                     }}>
                         Generate
                     </Button>
-
                 </DialogHeader>
-
             </DialogContent>
         </Dialog>
 

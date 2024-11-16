@@ -84,3 +84,4 @@ export async function generate(input: string) {
 
     return { output: stream.value };
 }
+

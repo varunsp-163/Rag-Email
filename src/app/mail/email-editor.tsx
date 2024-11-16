@@ -11,6 +11,8 @@ import { api } from '@/trpc/react'
 import { Input } from '@/components/ui/input'
 import AiComposeButton from './ai-compose-button'
 import { cn } from '@/lib/utils'
+import { generate } from './action'
+import { readStreamableValue } from 'ai/rsc'
 
 
 type Props = {
@@ -37,12 +39,24 @@ const EmailEditor = ({ ccValues, handleSend, isSending, setCcValues, setSubject,
     const [value, setValue] = React.useState<string>("")
 
     const [expanded, setExpanded] = React.useState<boolean>(defaultToolBarExpanded)
+    const [token, setToken] = React.useState<string>("")
+
+
+    const aiGenerate = async (value: string) => {
+        const { output } = await generate(value)
+        for await (const token of readStreamableValue(output)) {
+            if (token) {
+                setToken(token)
+            }
+        }
+    }
+
 
     const CustomText = Text.extend({
         addKeyboardShortcuts() {
             return {
                 'Meta-j': () => {
-                    console.log("Meta-j")
+                    aiGenerate(this.editor.getText())
                     return true;
                 }
             }
@@ -56,6 +70,10 @@ const EmailEditor = ({ ccValues, handleSend, isSending, setCcValues, setSubject,
             setValue(editor.getHTML())
         }
     })
+    React.useEffect(() => {
+        editor?.commands?.insertContent(token)
+
+    }, [editor, token])
 
     const onGenerate = (token: string) => {
         editor?.commands?.insertContent(token)
@@ -104,7 +122,7 @@ const EmailEditor = ({ ccValues, handleSend, isSending, setCcValues, setSubject,
                 </div>
             </div>
 
-            <div className={cn('prose w-full px-4 overflow-auto cursor-text', expanded ? "" : "h-[140px]")}>
+            <div className={cn('prose w-full px-4 overflow-auto cursor-text', expanded ? "" : "h-[150px]")}>
                 <EditorContent editor={editor} value={value} />
             </div>
             <Separator />
