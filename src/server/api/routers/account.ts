@@ -53,6 +53,7 @@ export const accountRouter = createTRPCRouter({
             }
         })
     }),
+
     getThreads: privateProcedure.input(z.object({
         accountId: z.string(),
         tab: z.string(),
@@ -60,6 +61,10 @@ export const accountRouter = createTRPCRouter({
     })).query(async ({ ctx, input }) => {
         // autht the user
         const account = await authoriseAccountAccess(input.accountId, ctx.auth.userId)
+        
+        const acc = new Account(account.token)
+        acc.syncEmails().catch(console.error)
+
         let filter: Prisma.ThreadWhereInput = {}
         if (input.tab === "inbox") {
             filter.inboxStatus = true
@@ -96,6 +101,7 @@ export const accountRouter = createTRPCRouter({
             }
         })
     }),
+
     getSuggestions: privateProcedure.input(z.object({
         accountId: z.string()
     })).query(async ({ ctx, input }) => {
