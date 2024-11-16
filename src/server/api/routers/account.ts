@@ -191,9 +191,11 @@ export const accountRouter = createTRPCRouter({
         query: z.string(),
     })).mutation(async ({ ctx, input }) => {
         const account = await authoriseAccountAccess(input.accountId, ctx.auth.userId)
-        console.log("Account ID", account.id, ctx.auth.userId,input.query)
+
         const orama = new OramaClient(account.id)
-        const results = orama.search({ term: input.query })
+        await orama.initialize()
+        const results = await orama.search({ term: input.query })
+
         return results
     })
 

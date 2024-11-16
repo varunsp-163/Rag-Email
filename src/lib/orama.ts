@@ -67,16 +67,17 @@ export class OramaClient {
     //     return results
     // }
     async search({ term }: { term: string }) {
-        return await search(this.orama, {
+        const ans = await search(this.orama, {
             term: term,
         });
+        return ans
     }
 
     async saveIndex() {
         const index = await persist(this.orama, 'json');
         await db.account.update({
             where: { id: this.accountId },
-            data: { oramaIndex: index }
+            data: { oramaIndex: index as Buffer }
         });
     }
 }
