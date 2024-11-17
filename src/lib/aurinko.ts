@@ -1,11 +1,31 @@
 "use server"
 import { auth } from '@clerk/nextjs/server'
 import axios from 'axios'
+import { getSubscriptionStatus } from './stripe-actions'
+import { db } from '@/server/db'
+import { FREE_ACCOUNTS_PER_USER, PRO_ACCOUNTS_PER_USER } from '@/app/constants'
 
 export const getAurinkoAuthUrl = async (serviceType: 'Google' | 'Office365') => {
     const { userId } = await auth()
     console.log("The user loggedIn is;", userId)
-    if (!userId) console.log("User UnAuthorised")
+    if (!user) throw new Error('User not found')
+
+    const isSubscribed = await getSubscriptionStatus()
+
+    const accounts = await db.account.count({
+        where: { userId }
+    })
+
+    if (isSubscribed) {
+        if (accounts >= PRO_ACCOUNTS_PER_USER) {
+            throw new Error('You have reached the maximum number of accounts for your subscription')
+        }
+    } else {
+        if (accounts >= FREE_ACCOUNTS_PER_USER) {
+            throw new Error('You have reached the maximum number of accounts for your subscription')
+        }
+    }
+
 
     const params = new URLSearchParams({
         clientId: process.env.AURIKO_CLIENT_ID as string,

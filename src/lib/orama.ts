@@ -35,7 +35,8 @@ export class OramaClient {
                     from: 'string',
                     to: 'string[]',
                     sentAt: 'string',
-                    threadId: 'string'
+                    threadId: 'string',
+                    embeddings: 'vector[1538]'
                 },
             });
             await this.saveIndex();
@@ -47,25 +48,25 @@ export class OramaClient {
         await this.saveIndex();
     }
 
-    // async vectorSearch({ prompt, numResults = 10 }: { prompt: string, numResults?: number }) {
-    //     const embeddings = await getEmbeddings(prompt)
-    //     const results = await search(this.orama, {
-    //         mode: 'hybrid',
-    //         term: prompt,
-    //         vector: {
-    //             value: embeddings,
-    //             property: 'embeddings'
-    //         },
-    //         similarity: 0.80,
-    //         limit: numResults,
-    //         // hybridWeights: {
-    //         //     text: 0.8,
-    //         //     vector: 0.2,
-    //         // }
-    //     })
-    //     // console.log(results.hits.map(hit => hit.document))
-    //     return results
-    // }
+    async vectorSearch({ prompt, numResults = 10 }: { prompt: string, numResults?: number }) {
+        const embeddings = await getEmbeddings(prompt)
+        const results = await search(this.orama, {
+            mode: 'hybrid',
+            term: prompt,
+            vector: {
+                value: embeddings,
+                property: 'embeddings'
+            },
+            similarity: 0.80,
+            limit: numResults,
+            // hybridWeights: {
+            //     text: 0.8,
+            //     vector: 0.2,
+            // }
+        })
+        // console.log(results.hits.map(hit => hit.document))
+        return results
+    }
     async search({ term }: { term: string }) {
         const ans = await search(this.orama, {
             term: term,

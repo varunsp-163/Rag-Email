@@ -11,6 +11,7 @@ import Sidebar from './sidebar'
 import ThreadList from './thread-list'
 import ThreaDisplay from './thread-display'
 import SearchBar from './search-bar'
+import AskAI from './ask-ai'
 
 
 
@@ -27,7 +28,7 @@ const Mail = ({ defaultLayout = [20, 32, 48], navCollapsedSize, defaultCollapse 
             <ResizablePanelGroup direction="horizontal" onLayout={(sizes: number[]) => {
                 console.log(sizes)
             }} className="items-stretch h-full min-h-screen">
-                <ResizablePanel defaultSize={defaultLayout[0]} collapsedSize={navCollapsedSize}
+                <ResizablePanel defaultSize={25} collapsedSize={navCollapsedSize}
                     collapsible={true}
                     minSize={15}
                     maxSize={40}
@@ -50,7 +51,7 @@ const Mail = ({ defaultLayout = [20, 32, 48], navCollapsedSize, defaultCollapse 
                         <Sidebar isCollapsed={isCollapsed} />
                         <div className='flex-1'>
                             {/* AI part */}
-                            ASK AI
+                            <AskAI/>
                         </div>
                     </div>
                 </ResizablePanel>
