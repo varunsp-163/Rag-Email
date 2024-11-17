@@ -4,6 +4,7 @@ import pLimit from 'p-limit';
 import { Prisma } from '@prisma/client';
 import { OramaClient } from './orama'
 import { turndown } from './turndown';
+import { getEmbeddings } from './embeddings';
 
 async function syncEmailsToDatabase(emails: EmailMessage[], accountId: string) {
     console.log(`Syncing ${emails.length} emails to database`);
@@ -19,6 +20,7 @@ async function syncEmailsToDatabase(emails: EmailMessage[], accountId: string) {
             await Promise.all(emails.map(email => {
                 return limit(async () => {
                     const body = turndown.turndown(email.body ?? email.bodySnippet ?? '')
+                    const embeddings = await getEmbeddings(body)
                     await orama.insert({
                         title: email.subject,
                         body: body,
@@ -26,7 +28,8 @@ async function syncEmailsToDatabase(emails: EmailMessage[], accountId: string) {
                         from: `${email.from.name} <${email.from.address}>`,
                         to: email.to.map(t => `${t.name} <${t.address}>`),
                         sentAt: new Date(email.sentAt).toLocaleString(),
-                        threadId: email.threadId
+                        threadId: email.threadId,
+                        embeddings
                     })
                 })
             }))

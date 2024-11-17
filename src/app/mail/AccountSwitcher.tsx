@@ -7,6 +7,7 @@ import { Plus } from 'lucide-react'
 
 
 import React from 'react'
+import { toast } from 'sonner'
 import { useLocalStorage } from "usehooks-ts"
 type Props = {
     isCollapsed: boolean
@@ -46,6 +47,14 @@ const AccountSwitcher = ({ isCollapsed }: Props) => {
                     })
                     }
                     <div onClick={async () => {
+
+                        try {
+                            const url = await getAurinkoAuthUrl('Google')
+                            window.location.href = url
+                        } catch (error) {
+                            toast.error((error as Error).message)
+                        }
+
                         const authUrl = await getAurinkoAuthUrl('Google')
                         window.location.href = authUrl
                     }} className='flex relative hover:bg-gray-50 cursor-pointer w-full items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none focus:bg-accent'>

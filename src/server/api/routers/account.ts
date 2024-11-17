@@ -5,6 +5,7 @@ import { Prisma } from "@prisma/client"
 import { emailAddressSchema } from "@/lib/types"
 import { Account } from "@/lib/account"
 import { OramaClient } from "@/lib/orama"
+import { FREE_CREDITS_PER_DAY } from "@/app/constants";
 
 
 export const authoriseAccountAccess = async (accountId: string, userId: string) => {
@@ -24,7 +25,9 @@ export const authoriseAccountAccess = async (accountId: string, userId: string) 
 
 
 export const accountRouter = createTRPCRouter({
+
     getAccounts: privateProcedure.query(async ({ ctx }) => {
+        console.log("ctx.auth.userId", ctx.auth.userId)
         return await ctx.db.account.findMany({
             where: { userId: ctx.auth.userId },
             select: {
@@ -36,6 +39,7 @@ export const accountRouter = createTRPCRouter({
         accountId: z.string(),
         tab: z.string()
     })).query(async ({ ctx, input }) => {
+
         const account = await authoriseAccountAccess(input.accountId, ctx.auth.userId)
 
         let filter: Prisma.ThreadWhereInput = {}
@@ -197,6 +201,19 @@ export const accountRouter = createTRPCRouter({
         const results = await orama.search({ term: input.query })
 
         return results
-    })
+    }),
+
+    getChatbotInteraction: privateProcedure.query(async ({ ctx }) => {
+        const chatbotInteraction = await ctx.db.chatbotInteraction.findUnique({
+            where: {
+                day: new Date().toDateString(),
+                userId: ctx.auth.userId
+            }, select: { count: true }
+        })
+        const remainingCredits = FREE_CREDITS_PER_DAY - (chatbotInteraction?.count || 0)
+        return {
+            remainingCredits
+        }
+    }),
 
 })
