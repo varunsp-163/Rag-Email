@@ -65,6 +65,7 @@
     "react-resizable-panels": "^2.1.6",
     "react-select": "^5.8.3",
     "server-only": "^0.0.1",
+    "sharp": "^0.33.5",
     "sonner": "^1.7.0",
     "stripe": "^17.3.1",
     "superjson": "^2.2.1",

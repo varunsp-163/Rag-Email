@@ -125,6 +125,8 @@ const EmailEditor = ({ ccValues, handleSend, isSending, setCcValues, setSubject,
             <div className={cn('prose w-full px-4 overflow-auto cursor-text', expanded ? "" : "h-[150px]")}>
                 <EditorContent editor={editor} value={value} />
             </div>
+
+
             <Separator />
             <div className="py-3 px-4 flex items-center justify-between">
                 <span className="text-sm">

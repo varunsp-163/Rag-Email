@@ -30,6 +30,7 @@ const ComposeButton = () => {
     const { account } = useThreads()
 
     const handleSend = async (value: string) => {
+        console.log("value",value)
         if (!account) return
         sendEmail.mutate({
             accountId: account.id,
